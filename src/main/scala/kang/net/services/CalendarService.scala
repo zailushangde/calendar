@@ -18,7 +18,8 @@ class CalendarServiceImpl extends CalendarService {
     val time = dateFormat.format(calendar.getTime)
 
     val today = time.split("-").toList match {
-      case year :: month :: day :: Nil => Today(year.toInt, month.toInt, day.toInt)
+      case year :: month :: day :: Nil =>
+        Today(year.toInt, month.toInt, day.toInt)
     }
 
     // Month value is 0-based. e.g., 0 for January.
@@ -54,7 +55,8 @@ class CalendarServiceImpl extends CalendarService {
     for (day <- 1 until (myCalendar.monthDays + firstDayOfWeek)) {
       if (day < firstDayOfWeek)
         htmlDaysBuffer ++= "  <li></li>\n"
-      else if (day == (date + firstDayOfWeek - 1)) htmlDaysBuffer ++= s"""  <li><span class=\"active\">$date</span></li>\n"""
+      else if (day == (date + firstDayOfWeek - 1))
+        htmlDaysBuffer ++= s"""  <li><span class=\"active\">$date</span></li>\n"""
       else htmlDaysBuffer ++= s"  <li>${day - (firstDayOfWeek - 1)}</li>\n"
     }
 

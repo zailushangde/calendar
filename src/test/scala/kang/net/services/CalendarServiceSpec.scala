@@ -8,6 +8,7 @@ class CalendarServiceSpec extends FlatSpec with Matchers {
   private val calendarService = new CalendarServiceImpl
 
   "The day of week for the first day in a month" should "be correct" in {
+
     /**
       *   date     |   dayOfWeek   |   dayOfWeek in the month
       * -----------------------------------------------------
@@ -20,13 +21,15 @@ class CalendarServiceSpec extends FlatSpec with Matchers {
     val testCalendarAndFirstDayOfWeek = List(
       MyCalendar(Today(2017, 3, 15), 31, 4) -> 4,
       MyCalendar(Today(2017, 9, 19), 30, 3) -> 6,
-      MyCalendar(Today(2017, 1,  8), 31, 2) -> 2,
+      MyCalendar(Today(2017, 1, 8), 31, 2) -> 2,
       MyCalendar(Today(2017, 2, 24), 28, 7) -> 5,
-      MyCalendar(Today(2017, 3,  1), 31, 5) -> 5
+      MyCalendar(Today(2017, 3, 1), 31, 5) -> 5
     )
 
-    testCalendarAndFirstDayOfWeek.foreach { case (c, target) =>
-      calendarService.getFirstDayOfWeek(c.dayOfWeek, c.today.date) should ===(target)
+    testCalendarAndFirstDayOfWeek.foreach {
+      case (c, target) =>
+        calendarService.getFirstDayOfWeek(c.dayOfWeek, c.today.date) should ===(
+          target)
     }
   }
 }
