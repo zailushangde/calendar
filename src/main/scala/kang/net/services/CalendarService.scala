@@ -20,6 +20,9 @@ class CalendarServiceImpl extends CalendarService {
       case year :: month :: day :: Nil => Today(year.toInt, month.toInt, day.toInt)
     }
 
+    // Month value is 0-based. e.g., 0 for January.
+    calendar.set(today.year, today.month - 1, today.date)
+
     val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
 
     MyCalendar(today, today.monthDays, dayOfWeek)
@@ -29,16 +32,17 @@ class CalendarServiceImpl extends CalendarService {
 
     val year = myCalendar.today.year
     val month = myCalendar.today.month
-    val today = myCalendar.today.day
+    val date = myCalendar.today.date
 
-    val firstDayOfWeek = myCalendar.dayOfWeek - (myCalendar.today.day - 1) + 7
+    val firstDayOfWeek = ((myCalendar.dayOfWeek - myCalendar.today.date % 7) + 7) % 7 + 1
 
-    val buffer = new StringBuilder
-    for (day <- 1 until myCalendar.monthDays + firstDayOfWeek) {
+    val htmlDaysBuffer = new StringBuilder
+
+    for (day <- 1 until (myCalendar.monthDays + firstDayOfWeek)) {
       if (day < firstDayOfWeek)
-        buffer ++= "  <li></li>\n"
-      else if (day == (today + firstDayOfWeek - 1)) buffer ++= s"""  <li><span class=\"active\">$today</span></li>\n"""
-      else buffer ++= s"  <li>${day - (firstDayOfWeek - 1)}</li>\n"
+        htmlDaysBuffer ++= "  <li></li>\n"
+      else if (day == (date + firstDayOfWeek - 1)) htmlDaysBuffer ++= s"""  <li><span class=\"active\">$date</span></li>\n"""
+      else htmlDaysBuffer ++= s"  <li>${day - (firstDayOfWeek - 1)}</li>\n"
     }
 
     s"""
@@ -156,7 +160,7 @@ class CalendarServiceImpl extends CalendarService {
       |</ul>
       |
       |<ul class="days">
-      |  $buffer
+      |  $htmlDaysBuffer
       |</ul>
       |
       |</body>

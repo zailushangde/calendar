@@ -1,6 +1,6 @@
 package kang.net.model
 
-case class Today(year: Int, month: Int, day: Int) {
+case class Today(year: Int, month: Int, date: Int) {
   private val month31 = List(1, 3, 5, 7, 8, 10, 12)
 
   private def isLeapYear: Boolean =
