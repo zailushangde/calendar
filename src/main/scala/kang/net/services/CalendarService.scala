@@ -3,6 +3,7 @@ package kang.net.services
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
+import com.google.common.annotations.VisibleForTesting
 import kang.net.model.{MyCalendar, Today}
 
 trait CalendarService {
@@ -28,13 +29,25 @@ class CalendarServiceImpl extends CalendarService {
     MyCalendar(today, today.monthDays, dayOfWeek)
   }
 
+  /**
+    * to get the day of week about the first day in the month
+    * @param dayOfWeek the day of week about the certain @date,
+    *                  which starts from 1. e.g., 1 for Sunday and 5 for Friday
+    * @param date a certain date
+    * @return the day of week about the first day in the month
+    */
+  @VisibleForTesting
+  private[kang] def getFirstDayOfWeek(dayOfWeek: Int, date: Int): Int =
+    ((dayOfWeek - date % 7) + 7) % 7 + 1
+
   def generateHtml(myCalendar: MyCalendar): String = {
 
     val year = myCalendar.today.year
     val month = myCalendar.today.month
     val date = myCalendar.today.date
+    val dayOfWeek = myCalendar.dayOfWeek
 
-    val firstDayOfWeek = ((myCalendar.dayOfWeek - myCalendar.today.date % 7) + 7) % 7 + 1
+    val firstDayOfWeek = getFirstDayOfWeek(dayOfWeek, date)
 
     val htmlDaysBuffer = new StringBuilder
 
@@ -143,7 +156,7 @@ class CalendarServiceImpl extends CalendarService {
       |        <li class="prev">&#10094;</li>
       |        <li class="next">&#10095;</li>
       |        <li>
-      |            $month<br>
+      |            $month 月<br>
       |            <span style="font-size:18px">$year</span>
       |        </li>
       |    </ul>
