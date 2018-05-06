@@ -16,7 +16,6 @@ class CalendarController(calendarService: CalendarService) extends Directives wi
   private def getTodayCalendar: Route = {
     val entity = calendarService.getTodayCalendar
     val html = calendarService.generateHtml(entity)
-    println(html)
     complete(HttpResponse(entity = HttpEntity(ContentTypes.`text/html(UTF-8)`, html.trim)))
   }
 
