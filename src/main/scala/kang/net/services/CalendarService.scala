@@ -1,58 +1,20 @@
 package kang.net.services
 
-import java.text.SimpleDateFormat
-import java.util.Calendar
-
-import com.google.common.annotations.VisibleForTesting
-import kang.net.model.{MyCalendar, Today}
+import kang.net.model.Today
 
 trait CalendarService {
-  def getTodayCalendar: MyCalendar
-  def generateHtml(myCalendar: MyCalendar): String
+  def generateCalendarHtml(today: Today): String
 }
 
 class CalendarServiceImpl extends CalendarService {
-  override def getTodayCalendar: MyCalendar = {
-    val dateFormat: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd")
-    val calendar = Calendar.getInstance()
-    val time = dateFormat.format(calendar.getTime)
 
-    val today = time.split("-").toList match {
-      case year :: month :: day :: Nil =>
-        Today(year.toInt, month.toInt, day.toInt)
-    }
+  def generateCalendarHtml(today: Today): String = {
 
-    // Month value is 0-based. e.g., 0 for January.
-    calendar.set(today.year, today.month - 1, today.date)
-
-    val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
-
-    MyCalendar(today, today.monthDays, dayOfWeek)
-  }
-
-  /**
-    * to get the day of week about the first day in the month
-    * @param dayOfWeek the day of week about the certain @date,
-    *                  which starts from 1. e.g., 1 for Sunday and 5 for Friday
-    * @param date a certain date
-    * @return the day of week about the first day in the month
-    */
-  @VisibleForTesting
-  private[kang] def getFirstDayOfWeek(dayOfWeek: Int, date: Int): Int =
-    ((dayOfWeek - date % 7) + 7) % 7 + 1
-
-  def generateHtml(myCalendar: MyCalendar): String = {
-
-    val year = myCalendar.today.year
-    val month = myCalendar.today.month
-    val date = myCalendar.today.date
-    val dayOfWeek = myCalendar.dayOfWeek
-
-    val firstDayOfWeek = getFirstDayOfWeek(dayOfWeek, date)
-
+    val date = today.date
+    val firstDayOfWeek = today.getFirstDayOfWeek
     val htmlDaysBuffer = new StringBuilder
 
-    for (day <- 1 until (myCalendar.monthDays + firstDayOfWeek)) {
+    for (day <- 1 until (today.getDaysInTheMonth + firstDayOfWeek)) {
       if (day < firstDayOfWeek)
         htmlDaysBuffer ++= "  <li></li>\n"
       else if (day == (date + firstDayOfWeek - 1))
@@ -158,8 +120,8 @@ class CalendarServiceImpl extends CalendarService {
       |        <li class="prev">&#10094;</li>
       |        <li class="next">&#10095;</li>
       |        <li>
-      |            $month 月<br>
-      |            <span style="font-size:18px">$year</span>
+      |            ${today.month} 月<br>
+      |            <span style="font-size:18px">${today.year}</span>
       |        </li>
       |    </ul>
       |</div>
