@@ -38,13 +38,22 @@ lazy val frontend = project
   .settings(
     name := "frontend",
     description := "the frontend for the calendar app",
-    scalaJSUseMainModuleInitializer := true,
+//    scalaJSUseMainModuleInitializer := true,
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.5",
       "org.querki" %%% "jquery-facade" % "1.2",
 
       // http client
-      "fr.hmil" %%% "roshttp" % "2.1.0"
+      "fr.hmil" %%% "roshttp" % "2.1.0",
+
+      // json
+        "io.circe" %%% "circe-core" % "0.9.3",
+        "io.circe" %%% "circe-generic" % "0.9.3",
+        "io.circe" %%% "circe-parser" % "0.9.3",
+        "io.circe" %%% "circe-generic-extras" % "0.9.3",
+
+      // scala tags
+      "com.lihaoyi" %%% "scalatags" % "0.6.2"
     ))
   .settings(
     mainClass := Some("kang.net.Bootstrap"),

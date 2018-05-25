@@ -1,47 +1,52 @@
 package kang.net
 
-import scala.scalajs.js.annotation.JSExportTopLevel
-import org.scalajs.dom
-import dom.document
-import org.querki.jquery._
-
-import fr.hmil.roshttp.HttpRequest
+import io.circe.parser.decode
 import monix.execution.Scheduler.Implicits.global
-import scala.util.{Failure, Success}
-import fr.hmil.roshttp.response.SimpleHttpResponse
+import org.scalajs.dom.html
+
+import scala.concurrent.Future
+import scala.scalajs.js.annotation.JSExportTopLevel
+import scalatags.JsDom.all._
 
 object Bootstrap {
 
-  def main(args: Array[String]): Unit = {
-    println("hello")
-    $(() => setupUI())
-  }
+  @JSExportTopLevel("generate")
+  def generate(month: html.Span, days: html.UList) = {
 
-  def setupUI(): Unit = {
-    $("body").append("<p>Hello hhh World</p>")
-    $("#click-me-button").click(() => addClickedMessage())
-    $("#click-me-button").click(() => getToday())
-  }
+    val res = Future(
+      """
+        |{
+        |  "today": {
+        |    "year": 2018,
+        |    "month": 5,
+        |    "date": 25,
+        |    "day_of_week": 6
+        |  },
+        |  "first_day_of_week": 3,
+        |  "days": 31
+        |}
+      """.stripMargin)
 
-  def appendPar(targetNode: dom.Node, text: String): Unit = {
-    val parNode = document.createElement("p")
-    val textNode = document.createTextNode(text)
-    parNode.appendChild(textNode)
-    targetNode.appendChild(parNode)
-  }
+    res.map { r =>
+      val maybeCalendar = decode[MyCalendar](r)
 
-  @JSExportTopLevel("addClickedMessage")
-  def addClickedMessage(): Unit = {
-    appendPar(document.body, "You clicked the button!")
-  }
+      maybeCalendar.map { myCalendar =>
+        val today = myCalendar.today
+        month.textContent = today.month + " 月"
+        for (day <- 1 until (today.getDaysInTheMonth + myCalendar.firstDayOfWeek)) {
+          val res =
+            if (day < myCalendar.firstDayOfWeek)
+              li
+            else if (day == (today.date + myCalendar.firstDayOfWeek - 1))
+              li(span(`class`:="active")(today.date))
+            else
+              li(day - (myCalendar.firstDayOfWeek - 1))
 
-  @JSExportTopLevel("getToday")
-  def getToday(): Unit = {
-    println("hello iam here")
-    val request = HttpRequest("http://localhost:9000/api/calendars")
-    request.send().onComplete {
-      case res: Success[SimpleHttpResponse] => appendPar(document.body, res.get.body)
-      case _: Failure[SimpleHttpResponse] => println("there is a failure")
+          days.appendChild(
+            res.render
+          )
+        }
+      }
     }
   }
 }
