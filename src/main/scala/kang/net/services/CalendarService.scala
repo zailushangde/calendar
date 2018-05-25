@@ -1,44 +1,25 @@
 package kang.net.services
 
-import java.text.SimpleDateFormat
-import java.util.Calendar
-
-import kang.net.model.{MyCalendar, Today}
+import kang.net.model.Today
 
 trait CalendarService {
-  def getTodayCalendar: MyCalendar
-  def generateHtml(myCalendar: MyCalendar): String
+  def generateCalendarHtml(today: Today): String
 }
 
 class CalendarServiceImpl extends CalendarService {
-  override def getTodayCalendar: MyCalendar = {
-    val dateFormat: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd")
-    val calendar = Calendar.getInstance()
-    val time = dateFormat.format(calendar.getTime)
 
-    val today = time.split("-").toList match {
-      case year :: month :: day :: Nil => Today(year.toInt, month.toInt, day.toInt)
-    }
+  def generateCalendarHtml(today: Today): String = {
 
-    val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+    val date = today.date
+    val firstDayOfWeek = today.getFirstDayOfWeek
+    val htmlDaysBuffer = new StringBuilder
 
-    MyCalendar(today, today.monthDays, dayOfWeek)
-  }
-
-  def generateHtml(myCalendar: MyCalendar): String = {
-
-    val year = myCalendar.today.year
-    val month = myCalendar.today.month
-    val today = myCalendar.today.day
-
-    val firstDayOfWeek = myCalendar.dayOfWeek - (myCalendar.today.day - 1) + 7
-
-    val buffer = new StringBuilder
-    for (day <- 1 until myCalendar.monthDays + firstDayOfWeek) {
+    for (day <- 1 until (today.getDaysInTheMonth + firstDayOfWeek)) {
       if (day < firstDayOfWeek)
-        buffer ++= "  <li></li>\n"
-      else if (day == (today + firstDayOfWeek - 1)) buffer ++= s"""  <li><span class=\"active\">$today</span></li>\n"""
-      else buffer ++= s"  <li>${day - (firstDayOfWeek - 1)}</li>\n"
+        htmlDaysBuffer ++= "  <li></li>\n"
+      else if (day == (date + firstDayOfWeek - 1))
+        htmlDaysBuffer ++= s"""  <li><span class=\"active\">$date</span></li>\n"""
+      else htmlDaysBuffer ++= s"  <li>${day - (firstDayOfWeek - 1)}</li>\n"
     }
 
     s"""
@@ -139,8 +120,8 @@ class CalendarServiceImpl extends CalendarService {
       |        <li class="prev">&#10094;</li>
       |        <li class="next">&#10095;</li>
       |        <li>
-      |            $month<br>
-      |            <span style="font-size:18px">$year</span>
+      |            ${today.month} 月<br>
+      |            <span style="font-size:18px">${today.year}</span>
       |        </li>
       |    </ul>
       |</div>
@@ -156,7 +137,7 @@ class CalendarServiceImpl extends CalendarService {
       |</ul>
       |
       |<ul class="days">
-      |  $buffer
+      |  $htmlDaysBuffer
       |</ul>
       |
       |</body>
