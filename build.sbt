@@ -22,17 +22,11 @@ val javascriptDependencies = Seq(
   "org.webjars" % "jquery" % "2.2.1" / "jquery.js" minified "jquery.min.js"
 )
 
-lazy val common = project
-  .settings(
-    name := "common",
-    description := "the common component for the calendar app")
-
 lazy val backend = project
   .settings(
     name := "backend",
     description := "the backend for the calendar app",
     libraryDependencies ++= backendDependencies)
-  .dependsOn(common)
 
 lazy val frontend = project
   .settings(
@@ -62,4 +56,3 @@ lazy val frontend = project
   .settings(
     jsDependencies ++= javascriptDependencies)
   .enablePlugins(ScalaJSPlugin)
-  .dependsOn(common)
