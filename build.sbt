@@ -4,6 +4,8 @@ version := "0.1"
 
 scalaVersion := "2.12.2"
 
+scalacOptions += "-Ypartial-unification"
+
 val akkaHttpVersion = "10.1.1"
 
 val backendDependencies = Seq(
@@ -17,8 +19,21 @@ val backendDependencies = Seq(
   // config loading
   "com.github.pureconfig" %% "pureconfig" % "0.9.1",
 
+  // db driver
+  "com.github.mauricio" %% "postgresql-async" % "0.2.21",
+
+  // cats
+  "org.typelevel" %% "cats-core" % "1.1.0",
+
+  // flyway
+  "org.flywaydb" % "flyway-maven-plugin" % "3.0",
+
+  "org.slf4j" % "slf4j-api" % "1.5.6" force(),
+
+  "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
   // test
-  "org.scalatest" %% "scalatest" % "3.0.5" % Test
+  "org.scalatest" %% "scalatest" % "3.0.5" % Test,
+  "org.testcontainers" % "postgresql" % "1.7.3" % Test
 )
 
 val javascriptDependencies = Seq(
@@ -43,10 +58,10 @@ lazy val frontend = project
       "fr.hmil" %%% "roshttp" % "2.1.0",
 
       // json
-        "io.circe" %%% "circe-core" % "0.9.3",
-        "io.circe" %%% "circe-generic" % "0.9.3",
-        "io.circe" %%% "circe-parser" % "0.9.3",
-        "io.circe" %%% "circe-generic-extras" % "0.9.3",
+      "io.circe" %%% "circe-core" % "0.9.3",
+      "io.circe" %%% "circe-generic" % "0.9.3",
+      "io.circe" %%% "circe-parser" % "0.9.3",
+      "io.circe" %%% "circe-generic-extras" % "0.9.3",
 
       // scala tags
       "com.lihaoyi" %%% "scalatags" % "0.6.2"

@@ -5,10 +5,11 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import kang.net.controllers.CalendarController
+import kang.net.persistence.DatabaseProvider
 import kang.net.services.CalendarServiceImpl
-import kang.net.utils.JsonMapping
+import kang.net.utils.config.AppConfig
 
-object AkkaHttpService extends App with JsonMapping {
+object AkkaHttpService extends App {
 
   implicit val system = ActorSystem("calendar-system")
   implicit val materializer = ActorMaterializer()
@@ -16,6 +17,8 @@ object AkkaHttpService extends App with JsonMapping {
 
   val calendarService = new CalendarServiceImpl
   val calendarController = new CalendarController(calendarService)
+
+  val dbProvider = new DatabaseProvider
 
   val routers: Route = calendarController.route
   Http().bindAndHandle(routers, "0.0.0.0", 9000)

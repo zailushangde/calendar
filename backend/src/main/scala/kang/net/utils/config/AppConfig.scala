@@ -1,7 +1,12 @@
 package kang.net.utils.config
 
+import pureconfig.error.ConfigReaderFailures
+
 case class AppConfig(database: DatabaseConfig)
 
 object AppConfig {
-  pureconfig.loadConfig[AppConfig]
+
+  def getAppConfig: Either[ConfigReaderFailures, AppConfig] = {
+    pureconfig.loadConfig[AppConfig]
+  }
 }
