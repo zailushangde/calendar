@@ -15,7 +15,7 @@ object DatabaseSpecHelper {
 
   private lazy val dbConfig = DatabaseConfig(postgres.getJdbcUrl, postgres.getUsername, postgres.getPassword)
 
-  private lazy val handler = new DatabaseProvider().getMauricioProvider(dbConfig)
+  private lazy val handler = new DatabaseProvider(dbConfig).getMauricioProvider()
 
   def dbConnection: Connection = {
     Await.result(handler.connect, 5.seconds)

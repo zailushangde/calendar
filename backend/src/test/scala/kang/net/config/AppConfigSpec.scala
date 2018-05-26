@@ -1,11 +1,13 @@
 package kang.net.config
 
 import kang.net.utils.config.AppConfig
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.{FlatSpec, Matchers, PrivateMethodTester}
+import pureconfig.error.ConfigReaderFailures
 
-class AppConfigSpec extends FlatSpec with Matchers {
+class AppConfigSpec extends FlatSpec with Matchers with PrivateMethodTester {
 
   "AppConfig" should "be loaded successfully" in {
-    AppConfig.getAppConfig.isRight shouldBe true
+    val getAppConfig = PrivateMethod[Either[ConfigReaderFailures, AppConfig]]('getAppConfig)
+    (AppConfig invokePrivate getAppConfig()).isRight shouldBe true
   }
 }

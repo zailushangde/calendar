@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait EventDao {
-  def getEventsInTheMonth(today: Option[Today]): Future[IndexedSeq[Event]]
+  def getEventsInTheMonth(today: Option[Today] = None): Future[IndexedSeq[Event]]
 
   def insertEvent(event: Event)
 }
