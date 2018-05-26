@@ -14,7 +14,10 @@ val backendDependencies = Seq(
 
   "com.google.guava" % "guava" % "12.0",
 
-  //test
+  // config loading
+  "com.github.pureconfig" %% "pureconfig" % "0.9.1",
+
+  // test
   "org.scalatest" %% "scalatest" % "3.0.5" % Test
 )
 
@@ -32,7 +35,6 @@ lazy val frontend = project
   .settings(
     name := "frontend",
     description := "the frontend for the calendar app",
-//    scalaJSUseMainModuleInitializer := true,
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.5",
       "org.querki" %%% "jquery-facade" % "1.2",

@@ -1,6 +1,7 @@
 package kang.net
 
 import io.circe.parser.decode
+import kang.net.model.MyCalendar
 import monix.execution.Scheduler.Implicits.global
 import org.scalajs.dom.html
 

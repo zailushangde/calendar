@@ -1,0 +1,10 @@
+version: '2'
+services:
+  postgres:
+    image: postgres:10.1
+    environment:
+      POSTGRES_USER: "calendar"
+      POSTGRES_PASSWORD: "calendar"
+      POSTGRES_DB: "calendar"
+    ports:
+      - "5222:5432"

@@ -1,11 +1,11 @@
-package kang.net
+package kang.net.model
 
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-import io.circe.{Decoder, ObjectEncoder}
 import io.circe.generic.extras._
 import io.circe.generic.extras.semiauto._
+import io.circe.{Decoder, ObjectEncoder}
 
 object Today {
   def apply: Today = {
