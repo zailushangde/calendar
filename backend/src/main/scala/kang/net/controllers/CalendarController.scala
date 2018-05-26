@@ -3,8 +3,8 @@ package kang.net.controllers
 import akka.http.scaladsl.server.{Directives, Route}
 import kang.net.services.CalendarService
 import kang.net.utils.JsonMapping
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpResponse}
-import kang.net.model.Today
+import kang.net.model.{MyCalendar, Today}
+import spray.json._
 
 class CalendarController(calendarService: CalendarService)
     extends Directives
@@ -17,10 +17,9 @@ class CalendarController(calendarService: CalendarService)
     (calendarsPathPrefix & get)(getTodayCalendar)
 
   private def getTodayCalendar: Route = {
-    val html = calendarService.generateCalendarHtml(Today.apply)
-    complete(
-      HttpResponse(
-        entity = HttpEntity(ContentTypes.`text/html(UTF-8)`, html.trim)))
+    val today = Today.apply
+    val calendar = MyCalendar(today, today.getFirstDayOfWeek, today.getDaysInTheMonth)
+    complete(calendar.toJson.prettyPrint)
   }
 
   val route: Route = getCalendars
