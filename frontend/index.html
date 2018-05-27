@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles.css">
+    <title>The Scala.js Tutorial</title>
+</head>
+<body>
+
+<h1>My Calendar</h1>
+
+<div class="month">
+  <ul>
+    <li class="prev">&#10094;</li>
+    <li class="next">&#10095;</li>
+    <li>
+      <span id="month"></span> <br>
+      <span style="font-size:18px">2017</span>
+    </li>
+  </ul>
+</div>
+
+<ul class="weekdays">
+  <li>Mo</li>
+  <li>Tu</li>
+  <li>We</li>
+  <li>Th</li>
+  <li>Fr</li>
+  <li>Sa</li>
+  <li>Su</li>
+</ul>
+
+<ul class="days"></ul>
+
+<!-- Include Scala.js compiled code -->
+<script type="text/javascript" src="./target/scala-2.12/frontend-fastopt.js"></script>
+<script>
+    generateMonthValue(document.getElementById("month"))
+    generateDaysWithEvent(document.getElementsByClassName("days")[0])
+</script>
+</body>
+</html>
