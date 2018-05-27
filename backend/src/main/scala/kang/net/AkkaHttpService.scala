@@ -6,7 +6,6 @@ import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import kang.net.controllers.{CalendarController, EventController}
 import kang.net.persistence.{DatabaseProvider, EventMauricioDao}
-import kang.net.services.CalendarServiceImpl
 import kang.net.utils.config.AppConfig
 import akka.http.scaladsl.server.Directives._
 import org.slf4j.LoggerFactory
@@ -19,8 +18,7 @@ object AkkaHttpService extends App {
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
-  val calendarService = new CalendarServiceImpl
-  val calendarController = new CalendarController(calendarService)
+  val calendarController = new CalendarController()
 
   val dbProvider = new DatabaseProvider(AppConfig.getConfig.database)
 

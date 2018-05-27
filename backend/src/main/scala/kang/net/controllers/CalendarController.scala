@@ -1,12 +1,11 @@
 package kang.net.controllers
 
 import akka.http.scaladsl.server.{Directives, Route}
-import kang.net.services.CalendarService
 import kang.net.utils.JsonMapping
 import kang.net.model.{MyCalendar, Today}
 import spray.json._
 
-class CalendarController(calendarService: CalendarService)
+class CalendarController()
     extends Directives
     with JsonMapping {
 
