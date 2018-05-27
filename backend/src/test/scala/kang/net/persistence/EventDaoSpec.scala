@@ -41,4 +41,19 @@ class EventDaoSpec extends AsyncFlatSpec with Matchers with BeforeAndAfterAll {
       assert(id == testId)
     }
   }
+
+  it should "be able to get event by id" in {
+    val knowEventId = 1
+    testDao.getEventById(knowEventId).map { event =>
+      assert(event.isDefined)
+      assert(event.get.id.get == knowEventId)
+    }
+  }
+
+  it should "return empty when to get a non-exist event by id" in {
+    val unknownEventId = 10
+    testDao.getEventById(unknownEventId).map { event =>
+      assert(event.isEmpty)
+    }
+  }
 }

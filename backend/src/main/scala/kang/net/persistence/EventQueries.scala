@@ -2,6 +2,11 @@ package kang.net.persistence
 
 object EventQueries {
 
+  val selectById =
+    """
+      | SELECT * FROM event where id = ?
+    """.stripMargin
+
   val insert =
     """
       | INSERT INTO event (title, description, event_start, event_end) VALUES

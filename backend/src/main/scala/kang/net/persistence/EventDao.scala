@@ -15,6 +15,8 @@ trait EventDao {
   def getEventsInTheMonth(today: Option[Today] = None): Future[IndexedSeq[Event]]
 
   def insertEvent(event: Event): Future[Int]
+
+  def getEventById(id: Int): Future[Option[Event]]
 }
 
 class EventMauricioDao(dbConnection: Connection) extends EventDao {
@@ -46,6 +48,12 @@ class EventMauricioDao(dbConnection: Connection) extends EventDao {
       case Some(id) => update(event, id)
       case _ => insert(event)
     }
+  }
+
+  override def getEventById(id: Int): Future[Option[Event]] = {
+    dbConnection
+      .sendPreparedStatement(EventQueries.selectById, Array(id))
+      .map(_.rows.get.map(rowToEvent).headOption)
   }
 
   private def insert(event: Event): Future[Int] = {
