@@ -1,0 +1,34 @@
+* {box-sizing: border-box;}
+ul {list-style-type: none;}
+body {font-family: Verdana, sans-serif;}
+
+.dates {
+    display: inline-block;
+    width: 100%;
+    font-size: 14px;
+    background-color: #ddd;
+    text-align: center;
+    color: #777;
+    margin-top: -30px;
+    padding: 10px 0;
+    margin-TOP: 0;
+}
+
+.desc {
+    display: inline-block;
+    width: 100%;
+    font-size: 20px;
+    background-color: #ddd;
+    text-align: center;
+    color: #777;
+    margin-top: -30px;
+    padding: 10px 0;
+}
+
+h2 {
+    padding: 70px 25px;
+    width: 100%;
+    text-align: center;
+    background: #1abc9c;
+    margin-BOTTOM: 0;
+}

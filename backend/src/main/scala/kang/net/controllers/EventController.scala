@@ -52,5 +52,5 @@ class EventController(eventDao: EventDao) extends Directives with JsonMapping {
     }
   }
 
-  val route: Route = listEvents ~ insertEvent ~ getEvent
+  val route: Route = getEvent ~ listEvents ~ insertEvent
 }
