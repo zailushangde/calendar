@@ -5,7 +5,13 @@ object EventQueries {
   val insert =
     """
       | INSERT INTO event (title, description, event_start, event_end) VALUES
-      | (?,?,?,?)
+      | (?,?,?,?) RETURNING id
+    """.stripMargin
+
+  val update =
+    """
+      | UPDATE event SET title = ?, description = ?, event_start = ?, event_end = ?
+      | WHERE id = ?
     """.stripMargin
 
   val select =

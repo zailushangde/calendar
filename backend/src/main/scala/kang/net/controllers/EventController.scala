@@ -2,6 +2,7 @@ package kang.net.controllers
 
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives
+import kang.net.model.Event
 import kang.net.persistence.EventDao
 import kang.net.utils.JsonMapping
 import spray.json._
@@ -15,8 +16,19 @@ class EventController(eventDao: EventDao)
   private val eventPathPrefix = pathPrefix(
     PathParts.Api / PathParts.Events)
 
-  val listCalendars: Route =
+  val listEvents: Route =
     (eventPathPrefix & get)(getMonthEvents)
+
+  val insertEvent: Route =
+    (eventPathPrefix & post)(upsertEvent)
+
+  private def upsertEvent: Route = entity(as[Event]) { event =>
+    for {
+      _ <- eventDao.insertEvent(event)
+    } yield ()
+
+    complete("200")
+  }
 
   private def getMonthEvents: Route = {
     val res = for {
@@ -29,5 +41,5 @@ class EventController(eventDao: EventDao)
     }
   }
 
-  val route: Route = getMonthEvents
+  val route: Route = listEvents ~ insertEvent
 }

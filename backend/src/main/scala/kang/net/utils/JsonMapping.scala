@@ -1,12 +1,13 @@
 package kang.net.utils
 
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import kang.net.model.{Event, MyCalendar, Today}
 import org.joda.time.{LocalDateTime => JodaLocalDateTime}
 import spray.json._
 
 import scala.util.{Failure, Success, Try}
 
-trait JsonMapping extends DefaultJsonProtocol {
+trait JsonMapping extends DefaultJsonProtocol with SprayJsonSupport {
   implicit val todayFormat: RootJsonFormat[Today] = jsonFormat(Today.apply, "year", "month", "date", "day_of_week")
   implicit val calendarFormat: RootJsonFormat[MyCalendar] = jsonFormat(MyCalendar.apply, "today", "first_day_of_week", "days")
 
