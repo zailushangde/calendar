@@ -22,7 +22,9 @@ logs
 # SBT specific
 **/project/boot/
 **/project/project/
+**/project/target/
 **/project/plugins/project/
+**/target/
 **/target/
 brand-bootstrap/media/
 .cache

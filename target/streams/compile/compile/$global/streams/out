@@ -1,5 +1,0 @@
-[0m[[0m[33mwarn[0m] [0m[0m/Users/zailushang/project/IJprojects/calendar/src/main/scala/kang/net/testObject.scala:15:31: match may not be exhaustive.[0m
-[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following inputs: List(_), List(_, _), List(_, _, _, _), Nil[0m
-[0m[[0m[33mwarn[0m] [0m[0m  val today = time.split("-").toList match {[0m
-[0m[[0m[33mwarn[0m] [0m[0m                              ^[0m
-[0m[[0m[33mwarn[0m] [0m[0mone warning found[0m
