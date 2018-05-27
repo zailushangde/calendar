@@ -9,7 +9,6 @@ case class MyCalendar(today: Today, firstDayOfWeek: Int, days: Int)
 object MyCalendar {
 
   implicit val customConfig: Configuration = Configuration.default.withSnakeCaseMemberNames.withDefaults
-
   implicit val todayEncoder: ObjectEncoder[MyCalendar] = deriveEncoder
   implicit val todayDecoder: Decoder[MyCalendar] = deriveDecoder
 }

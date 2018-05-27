@@ -63,6 +63,9 @@ lazy val frontend = project
       "io.circe" %%% "circe-parser" % "0.9.3",
       "io.circe" %%% "circe-generic-extras" % "0.9.3",
 
+      // time
+      "org.scala-js" %%% "scalajs-java-time" % "0.2.4",
+
       // scala tags
       "com.lihaoyi" %%% "scalatags" % "0.6.2"
     ))

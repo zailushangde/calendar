@@ -35,7 +35,8 @@
 <!-- Include Scala.js compiled code -->
 <script type="text/javascript" src="./target/scala-2.12/frontend-fastopt.js"></script>
 <script>
-    generate(document.getElementById("month"), document.getElementsByClassName("days")[0])
+    generateMonthValue(document.getElementById("month"))
+    generateDaysWithEvent(document.getElementsByClassName("days")[0])
 </script>
 </body>
 </html>

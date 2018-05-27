@@ -1,53 +1,64 @@
 package kang.net
 
+import cats.data.EitherT
+import cats.instances.future._
+import io.circe
 import io.circe.parser.decode
-import kang.net.model.MyCalendar
+import kang.net.model.{Event, MyCalendar, Today}
 import monix.execution.Scheduler.Implicits.global
 import org.scalajs.dom.html
 
-import scala.concurrent.Future
 import scala.scalajs.js.annotation.JSExportTopLevel
 import scalatags.JsDom.all._
 
+import scala.concurrent.Future
+
 object Bootstrap {
 
-  @JSExportTopLevel("generate")
-  def generate(month: html.Span, days: html.UList) = {
+  // temp import
+  import TestBackendData._
 
-    val res = Future(
-      """
-        |{
-        |  "today": {
-        |    "year": 2018,
-        |    "month": 5,
-        |    "date": 25,
-        |    "day_of_week": 6
-        |  },
-        |  "first_day_of_week": 3,
-        |  "days": 31
-        |}
-      """.stripMargin)
+  private def getDateFromBacked: EitherT[Future, circe.Error, (MyCalendar, List[Event])] = {
+    for{
+      calendarRes <- EitherT.right(calendarResFromBackend)
+      eventsRes <- EitherT.right(eventsResFromBackend)
+      calendar <- EitherT.fromEither(decode[MyCalendar](calendarRes))
+      events <- EitherT.fromEither(decode[List[Event]](eventsRes))
+    } yield (calendar, events)
+  }
 
-    res.map { r =>
-      val maybeCalendar = decode[MyCalendar](r)
+  @JSExportTopLevel("generateMonthValue")
+  def generateMonthValue(month: html.Span): Future[Either[circe.Error, Unit]] = {
+    getDateFromBacked.value.map(_.map { case (calendar, _) =>
+      val today: Today = calendar.today
+      month.textContent = today.month + " 月"
+    })
+  }
 
-      maybeCalendar.map { myCalendar =>
-        val today = myCalendar.today
-        month.textContent = today.month + " 月"
-        for (day <- 1 until (today.getDaysInTheMonth + myCalendar.firstDayOfWeek)) {
-          val res =
-            if (day < myCalendar.firstDayOfWeek)
-              li
-            else if (day == (today.date + myCalendar.firstDayOfWeek - 1))
-              li(span(`class`:="active")(today.date))
-            else
-              li(day - (myCalendar.firstDayOfWeek - 1))
+  @JSExportTopLevel("generateDaysWithEvent")
+  def generateDaysWithEvent(days: html.UList): Future[Either[circe.Error, Unit]] = {
+    getDateFromBacked.value.map(_.map { case (calendar, events) =>
 
-          days.appendChild(
-            res.render
-          )
+      val today: Today = calendar.today
+      val eventsByDate = events.groupBy(_.eventStart.getDayOfMonth)
+
+      for (day <- 1 until (today.getDaysInTheMonth + calendar.firstDayOfWeek)) {
+        val res =
+          if (day < calendar.firstDayOfWeek)
+            li
+          else if (day == (today.date + calendar.firstDayOfWeek - 1))
+            li(span(`class`:="active")(today.date))
+          else
+            li(day - (calendar.firstDayOfWeek - 1))
+
+        val eventRes = eventsByDate.get(day - (calendar.firstDayOfWeek - 1)).map {
+          list => res(a(href:="TODO")(list.head.title))
         }
+
+        days.appendChild(
+          eventRes.fold(res)(r => r).render
+        )
       }
-    }
+    })
   }
 }
