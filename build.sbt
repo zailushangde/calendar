@@ -6,6 +6,9 @@ scalaVersion := "2.12.2"
 
 scalacOptions += "-Ypartial-unification"
 
+resolvers +=
+  Resolver.sonatypeRepo("snapshots")
+
 val akkaHttpVersion = "10.1.1"
 
 val backendDependencies = Seq(
@@ -64,7 +67,8 @@ lazy val frontend = project
       "io.circe" %%% "circe-generic-extras" % "0.9.3",
 
       // time
-      "org.scala-js" %%% "scalajs-java-time" % "0.2.4",
+//      "org.scala-js" %%% "scalajs-java-time" % "0.2.4",
+      "io.github.cquiroz" %%% "scala-java-time" % "2.0.0-M13",
 
       // scala tags
       "com.lihaoyi" %%% "scalatags" % "0.6.2"
