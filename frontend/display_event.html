@@ -15,6 +15,6 @@
 <script>
     var url = new URL(window.location.href)
     var event_id = url.searchParams.get("event_id")
-    displayForm(document.getElementById("fieldSet"), Number(event_id))
+    displayForm(document.getElementById("fieldSet"), event_id == null? undefined: Number(event_id))
 </script>
 </html>
