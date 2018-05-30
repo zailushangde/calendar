@@ -6,7 +6,7 @@ import io.circe.generic.extras.Configuration
 import cats.syntax.either._
 import io.circe.generic.extras.semiauto.{deriveDecoder, deriveEncoder}
 
-case class Event(id: Int, title: String, description: String, eventStart: LocalDateTime, eventEnd: LocalDateTime)
+case class Event(id: Option[Int], title: String, description: String, eventStart: LocalDateTime, eventEnd: LocalDateTime)
 
 object Event {
   implicit val customConfig: Configuration = Configuration.default.withSnakeCaseMemberNames.withDefaults
