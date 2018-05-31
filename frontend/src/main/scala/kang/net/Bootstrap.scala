@@ -14,7 +14,6 @@ import monix.execution.Scheduler.Implicits.global
 import org.scalajs.dom
 import org.scalajs.dom.ext.Ajax
 import org.scalajs.dom.html
-import org.scalajs.dom.raw.Node
 import org.scalajs.dom.ext.Ajax._
 
 import scala.scalajs.js.annotation.JSExportTopLevel
@@ -25,16 +24,14 @@ import scala.scalajs.js
 import scala.util.{Failure, Success}
 
 object Bootstrap {
-
-  // temp import
-  import kang.net.temp.TestBackendData._
+  private val baseUrl = s"http://localhost:9001/api/"
 
   private def getDateFromBacked: EitherT[Future, circe.Error, (MyCalendar, List[Event])] = {
     for {
-      calendarRes <- EitherT.right(calendarResFromBackend)
-      eventsRes   <- EitherT.right(eventsResFromBackend)
-      calendar    <- EitherT.fromEither(decode[MyCalendar](calendarRes))
-      events      <- EitherT.fromEither(decode[List[Event]](eventsRes))
+      calendarRes <- EitherT.right(Ajax.get(baseUrl + "calendars"))
+      eventsRes   <- EitherT.right(Ajax.get(baseUrl + "events"))
+      calendar    <- EitherT.fromEither(decode[MyCalendar](calendarRes.responseText))
+      events      <- EitherT.fromEither(decode[List[Event]](eventsRes.responseText))
     } yield (calendar, events)
   }
 
@@ -64,7 +61,7 @@ object Bootstrap {
               li(day - (calendar.firstDayOfWeek - 1))
 
           val eventRes = eventsByDate.get(day - (calendar.firstDayOfWeek - 1)).map { list =>
-            res(a(href := s"event_view.html?event_id=${list.head.id}")(list.head.title))
+            res(a(href := s"event_view.html?event_id=${list.head.id.get}")(list.head.title))
           }
 
           days.appendChild(
@@ -75,7 +72,7 @@ object Bootstrap {
   }
 
   @JSExportTopLevel("displayEvent")
-  def displayEvent(eventId: Int, eventView: html.Span): EitherT[Future, circe.Error, Node] = {
+  def displayEvent(eventId: Int, eventView: html.Span): EitherT[Future, circe.Error, Unit] = {
     val url = s"http://localhost:9001/api/events/$eventId"
 
     for {
@@ -94,6 +91,8 @@ object Bootstrap {
       eventView.appendChild(h2(event.title).render).render
       eventView.appendChild(p(`class` := "dates")(displayDate).render)
       eventView.appendChild(p(`class` := "desc")(event.description).render)
+
+      eventView.appendChild(a(href := s"display_event.html?event_id=$eventId")("Edit Event").render)
     }
   }
 
@@ -102,7 +101,7 @@ object Bootstrap {
     var submit = "Create a New Event"
 
     val maybeEvent: Option[EitherT[Future, circe.Error, Option[Event]]] = eventId.toOption.map { id =>
-      val url = s"http://localhost:9001/api/events/$id"
+      val url = s"${baseUrl}events/$id"
       submit = "Edit The Event"
       for {
         response <- EitherT.right(Ajax.get(url))
@@ -142,7 +141,7 @@ object Bootstrap {
   }
 
   def postEvent(mouseEvent: dom.MouseEvent) = {
-    val url         = "http://localhost:9001/api/events"
+    val url         = s"${baseUrl}events"
     val event_id    = Option(dom.document.getElementById("event_id")).map(_.asInstanceOf[html.Paragraph].textContent)
     val title       = dom.document.getElementById("event_title").asInstanceOf[html.Input].value
     val event_start = dom.document.getElementById("event_start").asInstanceOf[html.Input].value
@@ -153,10 +152,18 @@ object Bootstrap {
     val postBody = Event(event_id.map(_.toInt), title, desc, LocalDateTime.parse(event_start), LocalDateTime.parse(event_end))
     println(postBody.asJson.noSpaces)
     Ajax
-      .post(url, InputData.str2ajax(postBody.asJson.noSpaces), headers = Map("Content-Type" -> "application/json"))
+      .post(
+        url,
+        InputData.str2ajax(postBody.asJson.noSpaces),
+        headers = Map("Content-Type" -> "application/json")
+      )
       .onComplete {
-        case Success(_) => println("success")
-        case Failure(_) => println("failure")
+        case Success(_) =>
+          println("success")
+          dom.document.location.href = "/"
+        case Failure(_) =>
+          println("failure")
+          dom.window.alert("Something Wrong")
       }
   }
 }

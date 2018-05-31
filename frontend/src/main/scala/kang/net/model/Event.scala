@@ -16,6 +16,6 @@ object Event {
 
   implicit val timeEncoder: Encoder[LocalDateTime] = Encoder.encodeString.contramap[LocalDateTime](_.toString)
   implicit val timeDecoder: Decoder[LocalDateTime] = Decoder.decodeString.emap { str =>
-    Either.catchNonFatal(LocalDateTime.parse(str)).leftMap(t => "LocalDateTime")
+    Either.catchNonFatal(LocalDateTime.parse(str)).leftMap(_ => "LocalDateTime")
   }
 }

@@ -19,9 +19,10 @@ class CalendarServiceSpec extends FlatSpec with Matchers {
     val testDateList = List(
       Today(2017, 3, 15, 4) -> 4,
       Today(2017, 9, 19, 3) -> 6,
-      Today(2018, 1, 8, 2) -> 2,
+      Today(2018, 1, 8, 2)  -> 2,
       Today(2018, 2, 24, 7) -> 5,
-      Today(2018, 3, 1, 5) -> 5
+      Today(2018, 3, 1, 5)  -> 5,
+      Today(2018, 6, 1, 6)  -> 6
     )
 
     testDateList.foreach {
