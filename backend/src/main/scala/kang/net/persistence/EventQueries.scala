@@ -2,6 +2,11 @@ package kang.net.persistence
 
 object EventQueries {
 
+  val deleteById =
+    """
+      | UPDATE event SET available = false WHERE id = ?
+    """.stripMargin
+
   val selectById =
     """
       | SELECT * FROM event where id = ?
@@ -21,7 +26,7 @@ object EventQueries {
 
   val select =
     """
-      |SELECT id, title, description, event_start, event_end FROM event
-      |WHERE event_start BETWEEN ? AND ? ORDER BY event_start
+      | SELECT id, title, description, event_start, event_end, available FROM event
+      | WHERE event_start BETWEEN ? AND ? ORDER BY event_start
     """.stripMargin
 }

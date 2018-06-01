@@ -22,6 +22,16 @@ class EventController(eventDao: EventDao) extends Directives with JsonMapping {
   val getEvent: Route =
     (eventPathPrefix & get)(getEventById)
 
+  val deleteEvent: Route =
+    (eventPathPrefix & delete)(deleteEventById)
+
+  private def deleteEventById: Route = path(IntNumber) { id =>
+    for {
+      _ <- eventDao.deleteEventById(id)
+    } yield ()
+
+    complete("200")
+  }
   private def getEventById: Route = path(IntNumber) { id =>
     val res = for {
       event <- eventDao.getEventById(id)

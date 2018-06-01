@@ -17,6 +17,8 @@ trait EventDao {
   def insertEvent(event: Event): Future[Int]
 
   def getEventById(id: Int): Future[Option[Event]]
+
+  def deleteEventById(id: Int): Future[Int]
 }
 
 class EventMauricioDao(dbConnection: Connection) extends EventDao {
@@ -76,7 +78,14 @@ class EventMauricioDao(dbConnection: Connection) extends EventDao {
         title = row("title").asInstanceOf[String],
         description = row("description").asInstanceOf[String],
         eventStart = row("event_start").asInstanceOf[LocalDateTime],
-        eventEnd = row("event_end").asInstanceOf[LocalDateTime]
+        eventEnd = row("event_end").asInstanceOf[LocalDateTime],
+        available = row("available").asInstanceOf[Boolean]
       )
+  }
+
+  override def deleteEventById(id: Int): Future[Int] = {
+    dbConnection
+        .sendPreparedStatement(EventQueries.deleteById, Array(id))
+        .map(_ => id)
   }
 }

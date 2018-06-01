@@ -19,7 +19,7 @@ class EventDaoSpec extends AsyncFlatSpec with Matchers with BeforeAndAfterAll {
 
   lazy val testDao = new EventMauricioDao(dbConnection)
 
-  private val testEvent = Event(None, "title_test", "des_test", LocalDateTime.now(), LocalDateTime.now())
+  private val testEvent = Event(None, "title_test", "des_test", LocalDateTime.now(), LocalDateTime.now(), available = true)
 
   private var testId = 0
 
@@ -54,6 +54,26 @@ class EventDaoSpec extends AsyncFlatSpec with Matchers with BeforeAndAfterAll {
     val unknownEventId = 10
     testDao.getEventById(unknownEventId).map { event =>
       assert(event.isEmpty)
+    }
+  }
+
+  it should "be able to delete event by id" in {
+    val knowEventId = 1
+    testDao.deleteEventById(knowEventId).map { id =>
+      assert(id == knowEventId)
+    }
+
+    testDao.getEventById(knowEventId).map { event =>
+      assert(event.isDefined)
+      assert(!event.get.available)
+    }
+  }
+
+  it should "be able to delete non-exist event" in {
+    val unknownEventId = 10
+
+    testDao.deleteEventById(unknownEventId).map { id =>
+      assert(id == unknownEventId)
     }
   }
 }
