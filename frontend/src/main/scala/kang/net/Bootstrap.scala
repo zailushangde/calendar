@@ -73,7 +73,7 @@ object Bootstrap {
 
   @JSExportTopLevel("displayEvent")
   def displayEvent(eventId: Int, eventView: html.Span): EitherT[Future, circe.Error, Unit] = {
-    val url = s"http://localhost:9001/api/events/$eventId"
+    val url = s"${baseUrl}events/$eventId"
 
     for {
       response <- EitherT.right(Ajax.get(url))
@@ -92,7 +92,14 @@ object Bootstrap {
       eventView.appendChild(p(`class` := "dates")(displayDate).render)
       eventView.appendChild(p(`class` := "desc")(event.description).render)
 
-      eventView.appendChild(a(href := s"display_event.html?event_id=$eventId")("Edit Event").render)
+      eventView.appendChild(button(a(href := s"display_event.html?event_id=$eventId")("Edit Event")).render)
+      eventView.appendChild(button(`type` := "delete", id := "delete")("Delete").render)
+
+      dom.document
+        .getElementById("delete")
+        .addEventListener("click", (mouseEvent: dom.MouseEvent) => {
+          handleComplete(Ajax.delete(url))
+        })
     }
   }
 
@@ -140,7 +147,7 @@ object Bootstrap {
     }
   }
 
-  def postEvent(mouseEvent: dom.MouseEvent) = {
+  def postEvent(mouseEvent: dom.MouseEvent): Unit = {
     val url         = s"${baseUrl}events"
     val event_id    = Option(dom.document.getElementById("event_id")).map(_.asInstanceOf[html.Paragraph].textContent)
     val title       = dom.document.getElementById("event_title").asInstanceOf[html.Input].value
@@ -151,19 +158,23 @@ object Bootstrap {
 
     val postBody = Event(event_id.map(_.toInt), title, desc, LocalDateTime.parse(event_start), LocalDateTime.parse(event_end))
     println(postBody.asJson.noSpaces)
-    Ajax
-      .post(
-        url,
-        InputData.str2ajax(postBody.asJson.noSpaces),
-        headers = Map("Content-Type" -> "application/json")
-      )
-      .onComplete {
-        case Success(_) =>
-          println("success")
-          dom.document.location.href = "/"
-        case Failure(_) =>
-          println("failure")
-          dom.window.alert("Something Wrong")
-      }
+    handleComplete(
+      Ajax
+        .post(
+          url,
+          InputData.str2ajax(postBody.asJson.noSpaces),
+          headers = Map("Content-Type" -> "application/json")
+        ))
+  }
+
+  def handleComplete(res: Future[dom.XMLHttpRequest]): Unit = {
+    res.onComplete {
+      case Success(_) =>
+        println("success")
+        dom.document.location.href = "/"
+      case Failure(_) =>
+        println("failure")
+        dom.window.alert("Something Wrong, please try again")
+    }
   }
 }

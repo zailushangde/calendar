@@ -27,6 +27,6 @@ object EventQueries {
   val select =
     """
       | SELECT id, title, description, event_start, event_end, available FROM event
-      | WHERE event_start BETWEEN ? AND ? ORDER BY event_start
+      | WHERE event_start BETWEEN ? AND ? AND available = true ORDER BY event_start
     """.stripMargin
 }
