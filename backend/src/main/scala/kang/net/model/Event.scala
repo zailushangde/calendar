@@ -6,7 +6,5 @@ case class Event(id: Option[Int],
                  title: String,
                  description: String,
                  eventStart: LocalDateTime,
-                 eventEnd: LocalDateTime) {
-
-
-}
+                 eventEnd: LocalDateTime,
+                 available: Boolean = true) {}

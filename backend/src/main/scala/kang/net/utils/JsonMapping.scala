@@ -26,5 +26,5 @@ trait JsonMapping extends DefaultJsonProtocol with SprayJsonSupport {
       }
     }
 
-  implicit val eventFormat: RootJsonFormat[Event] = jsonFormat(Event.apply, "id", "title", "description", "event_start", "event_end")
+  implicit val eventFormat: RootJsonFormat[Event] = jsonFormat(Event.apply, "id", "title", "description", "event_start", "event_end", "available")
 }

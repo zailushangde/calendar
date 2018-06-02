@@ -6,7 +6,12 @@ import io.circe.generic.extras.Configuration
 import cats.syntax.either._
 import io.circe.generic.extras.semiauto.{deriveDecoder, deriveEncoder}
 
-case class Event(id: Int, title: String, description: String, eventStart: LocalDateTime, eventEnd: LocalDateTime)
+case class Event(id: Option[Int],
+                 title: String,
+                 description: String,
+                 eventStart: LocalDateTime,
+                 eventEnd: LocalDateTime,
+                 available: Boolean = true)
 
 object Event {
   implicit val customConfig: Configuration = Configuration.default.withSnakeCaseMemberNames.withDefaults
@@ -16,6 +21,6 @@ object Event {
 
   implicit val timeEncoder: Encoder[LocalDateTime] = Encoder.encodeString.contramap[LocalDateTime](_.toString)
   implicit val timeDecoder: Decoder[LocalDateTime] = Decoder.decodeString.emap { str =>
-    Either.catchNonFatal(LocalDateTime.parse(str)).leftMap(t => "LocalDateTime")
+    Either.catchNonFatal(LocalDateTime.parse(str)).leftMap(_ => "LocalDateTime")
   }
 }

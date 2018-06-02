@@ -34,6 +34,7 @@ val backendDependencies = Seq(
   "org.slf4j" % "slf4j-api" % "1.5.6" force(),
 
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
+
   // test
   "org.scalatest" %% "scalatest" % "3.0.5" % Test,
   "org.testcontainers" % "postgresql" % "1.7.3" % Test

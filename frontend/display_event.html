@@ -2,18 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="event.css">
-    <title>Event View</title>
+    <link rel="stylesheet" href="display_event.css">
+    <title>Display Event</title>
 </head>
 <body>
 <div>
-    <span id="event" class="event"></span>
+    <fieldset id="fieldSet"></fieldset>
 </div>
+
 </body>
 <script type="text/javascript" src="./target/scala-2.12/frontend-fastopt.js"></script>
 <script>
     var url = new URL(window.location.href)
     var event_id = url.searchParams.get("event_id")
-    displayEvent(Number(event_id), document.getElementById("event"))
+    displayForm(document.getElementById("fieldSet"), event_id == null? undefined: Number(event_id))
 </script>
 </html>
