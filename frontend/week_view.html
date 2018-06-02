@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles.css">
+    <title>A Week</title>
+</head>
+<body>
+
+<ul class="weekdays">
+    <li>Su</li>
+    <li>Mo</li>
+    <li>Tu</li>
+    <li>We</li>
+    <li>Th</li>
+    <li>Fr</li>
+    <li>Sa</li>
+</ul>
+
+<ul id="days" class="days"></ul>
+
+</body>
+<script type="text/javascript" src="./target/scala-2.12/frontend-fastopt.js"></script>
+<script>
+    var url = new URL(window.location.href)
+    var calendar = url.searchParams.get("calendar")
+    displayWeekView(calendar)
+</script>
+</html>

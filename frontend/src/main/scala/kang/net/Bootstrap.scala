@@ -1,5 +1,6 @@
 package kang.net
 
+import java.net.URLDecoder
 import java.time.{LocalDateTime, Month}
 import java.time.format.{DateTimeFormatter, TextStyle}
 import java.util.Locale
@@ -35,38 +36,64 @@ object Bootstrap {
     } yield (calendar, events)
   }
 
-  @JSExportTopLevel("generateMonthValue")
-  def generateMonthValue(month: html.Span): Future[Either[circe.Error, Unit]] = {
-    getDateFromBacked.value.map(_.map {
-      case (calendar, _) =>
-        val today: Today = calendar.today
-        month.textContent = Month.of(today.month).getDisplayName(TextStyle.FULL, Locale.ENGLISH)
-    })
+  private def getDateForWeekView(rawCalendar: String) = {
+    for {
+      eventsRes <- EitherT.right(Ajax.get(baseUrl + "events"))
+      calendar  <- EitherT.fromEither(decode[MyCalendar](rawCalendar))
+      events    <- EitherT.fromEither(decode[List[Event]](eventsRes.responseText))
+    } yield (calendar, events)
   }
 
   @JSExportTopLevel("generateDaysWithEvent")
   def generateDaysWithEvent(days: html.UList): Future[Either[circe.Error, Unit]] = {
     getDateFromBacked.value.map(_.map {
       case (calendar, events) =>
-        val today: Today = calendar.today
-        val eventsByDate = events.groupBy(_.eventStart.getDayOfMonth)
+        val today: Today   = calendar.today
+        val eventsByDate   = events.groupBy(_.eventStart.getDayOfMonth)
+        val firstDayOfWeek = calendar.firstDayOfWeek
 
-        for (day <- 1 until (today.getDaysInTheMonth + calendar.firstDayOfWeek)) {
+        // generate month value
+        dom.document.getElementById("month").asInstanceOf[html.Span].textContent =
+          Month.of(today.month).getDisplayName(TextStyle.FULL, Locale.ENGLISH)
+
+        // generate days list
+        for (day <- 1 until (today.getDaysInTheMonth + firstDayOfWeek)) {
           val res =
-            if (day < calendar.firstDayOfWeek)
+            if (day < firstDayOfWeek)
               li
-            else if (day == (today.date + calendar.firstDayOfWeek - 1))
-              li(span(`class` := "active")(today.date))
+            else if (day == (today.date + firstDayOfWeek - 1))
+              li(value := today.date, span(`class` := "active")(today.date))
             else
-              li(day - (calendar.firstDayOfWeek - 1))
+              li(value := day - (firstDayOfWeek - 1))(day - (firstDayOfWeek - 1))
 
-          val eventRes = eventsByDate.get(day - (calendar.firstDayOfWeek - 1)).map { list =>
+          val eventRes = eventsByDate.get(day - (firstDayOfWeek - 1)).map { list =>
             res(a(href := s"event_view.html?event_id=${list.head.id.get}")(list.head.title))
           }
 
           days.appendChild(
             eventRes.fold(res)(r => r).render
           )
+        }
+
+        val listLi = dom.document
+          .getElementsByClassName("days")
+          .item(0)
+          .getElementsByTagName("li")
+
+        for (elm <- 0 to listLi.length) {
+          listLi
+            .item(elm)
+            .addEventListener(
+              "click",
+              (mouseEvent: dom.MouseEvent) => {
+                val dateForWeekView      = mouseEvent.target.asInstanceOf[html.LI].value
+                val dayOfWeekForWeekView = ((dateForWeekView - today.date) % 7 + today.dayOfWeek) % 7
+                println(dateForWeekView)
+                val newCalendar = calendar.copy(today = today.copy(date = dateForWeekView, dayOfWeek = dayOfWeekForWeekView))
+                //              dom.document.location.href = "/display_event.html"
+                dom.document.location.href = s"/week_view.html?calendar=${newCalendar.asJson}"
+              }
+            )
         }
     })
   }
@@ -87,24 +114,30 @@ object Bootstrap {
       val eventStart  = event.eventStart.format(timeFormatter)
       val eventEnd    = event.eventEnd.format(timeFormatter)
       val displayDate = s"$monthName $dateValue, $yearValue, $eventStart - $eventEnd"
-      println(displayDate + " yyy")
+
       eventView.appendChild(h2(event.title).render).render
       eventView.appendChild(p(`class` := "dates")(displayDate).render)
       eventView.appendChild(p(`class` := "desc")(event.description).render)
 
-      eventView.appendChild(button(a(href := s"display_event.html?event_id=$eventId")("Edit Event")).render)
+      val backButton = button()("Edit Event").render
+      eventView.appendChild(backButton)
       eventView.appendChild(button(`type` := "delete", id := "delete")("Delete").render)
+
+      backButton.onclick = (_: dom.MouseEvent) => {
+        dom.document.location.href = s"/display_event.html?event_id=$eventId"
+      }
 
       dom.document
         .getElementById("delete")
-        .addEventListener("click", (mouseEvent: dom.MouseEvent) => {
-          handleComplete(Ajax.delete(url))
+        .addEventListener("click", (_: dom.MouseEvent) => {
+          if (dom.window.confirm("Are you sure to delete?"))
+            handleComplete(Ajax.delete(url))
         })
     }
   }
 
   @JSExportTopLevel("displayForm")
-  def displayForm(fieldSet: html.FieldSet, eventId: js.UndefOr[Int]) = {
+  def displayForm(fieldSet: html.FieldSet, eventId: js.UndefOr[Int]): Future[Either[circe.Error, Unit]] = {
     var submit = "Create a New Event"
 
     val maybeEvent: Option[EitherT[Future, circe.Error, Option[Event]]] = eventId.toOption.map { id =>
@@ -130,10 +163,12 @@ object Bootstrap {
         fieldSet.appendChild(input(`type` := "text", name := "event_title", id := "event_title", value := maybeTitle).render)
 
         fieldSet.appendChild(label(`for` := "event_start")("Start Time").render)
-        fieldSet.appendChild(input(`type` := "text", name := "event_start", id := "event_start", value := maybeEventStart).render)
+        fieldSet.appendChild(
+          input(`type` := "datetime-local", name := "event_start", id := "event_start", value := maybeEventStart).render)
 
         fieldSet.appendChild(label(`for` := "event_end")("End Time").render)
-        fieldSet.appendChild(input(`type` := "text", name := "event_end", id := "event_end", value := maybeEventEnd).render)
+        fieldSet.appendChild(
+          input(`type` := "datetime-local", name := "event_end", id := "event_end", value := maybeEventEnd).render)
 
         fieldSet.appendChild(label(`for` := "event_desc")("Event Description").render)
         fieldSet.appendChild(textarea(`type` := "text", name := "event_desc", id := "event_desc")(maybeDesc).render)
@@ -154,7 +189,6 @@ object Bootstrap {
     val event_start = dom.document.getElementById("event_start").asInstanceOf[html.Input].value
     val event_end   = dom.document.getElementById("event_end").asInstanceOf[html.Input].value
     val desc        = dom.document.getElementById("event_desc").asInstanceOf[html.Input].value
-    println("the button is triggered " + event_id)
 
     val postBody = Event(event_id.map(_.toInt), title, desc, LocalDateTime.parse(event_start), LocalDateTime.parse(event_end))
     println(postBody.asJson.noSpaces)
@@ -170,11 +204,54 @@ object Bootstrap {
   def handleComplete(res: Future[dom.XMLHttpRequest]): Unit = {
     res.onComplete {
       case Success(_) =>
-        println("success")
         dom.document.location.href = "/"
       case Failure(_) =>
-        println("failure")
         dom.window.alert("Something Wrong, please try again")
+    }
+  }
+
+  @JSExportTopLevel("displayWeekView")
+  def displayWeekView(rawCalendar: String) = {
+
+    val decodeCalenderFromUrl = URLDecoder.decode(rawCalendar)
+    println(decodeCalenderFromUrl)
+    getDateForWeekView(decodeCalenderFromUrl).map {
+      case (calendar, events) =>
+        val eventsByDate = events.groupBy(_.eventStart.getDayOfMonth)
+        val daysView     = dom.document.getElementById("days")
+        val date         = calendar.today.date
+        val dayOfDate    = calendar.today.dayOfWeek
+
+        for (index <- (date - (dayOfDate - 1)) to (date + (7 - dayOfDate))) {
+          val dayEle =
+            if (index <= 0 || index > calendar.days) {
+              li
+            } else
+              li(index)
+
+          val eventRes = eventsByDate.get(index).map { list =>
+            dayEle(a(href := s"event_view.html?event_id=${list.head.id.get}")(list.head.title))
+          }
+          daysView.appendChild(
+            eventRes.fold(dayEle)(r => r).render
+          )
+        }
+
+        val listLi = dom.document
+          .getElementsByClassName("days")
+          .item(0)
+          .getElementsByTagName("li")
+
+        for (elm <- 0 to listLi.length) {
+          listLi
+            .item(elm)
+            .addEventListener(
+              "click",
+              (_: dom.MouseEvent) => {
+                dom.document.location.href = "/display_event.html"
+              }
+            )
+        }
     }
   }
 }
