@@ -1,0 +1,85 @@
+.weekdays {
+    margin: 0;
+    padding: 10px 0;
+    background-color: #ddd;
+    left: 100px;
+    position: relative;
+}
+
+.weekdays li {
+    display: inline-block;
+    width: 13.6%;
+    color: #666;
+    text-align: center;
+}
+
+.days {
+    padding: 10px 0;
+    background: #eee;
+    margin: 0;
+    left: 100px;
+    position: relative;
+}
+
+.days li {
+    list-style-type: none;
+    display: inline-block;
+    width: 13.6%;
+    text-align: center;
+    margin-bottom: 5px;
+    font-size:12px;
+    color: #777;
+}
+
+.times li {
+    list-style-type: none;
+    display: table-row-group;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 20px;
+    font-size:12px;
+    color: #888;
+}
+
+.container {
+  height:720px;
+  width: 900px;
+  display: inline-flex;
+}
+
+.timings {
+  text-align: right;
+  width: 100px;
+  height: 720px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: white;
+  font-size: 0.5em;
+  box-sizing: border-box
+}
+
+.timings span {
+  font-size: 200%;
+  color: #696969;
+}
+
+.event {
+  background-color: white;
+  border-style: solid;
+  border-width: 1px;
+  border-left-width: 5px;
+  border-color: #D1D1D1;
+  border-left-color: #57b986;
+  padding-left: 10px;
+  padding-top: 5px;
+  position: absolute;
+  font-size: 0.5em;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.event .title {
+  color: #57b986;
+  font-size: 200%;
+}

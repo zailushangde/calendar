@@ -87,9 +87,11 @@ object Bootstrap {
               "click",
               (mouseEvent: dom.MouseEvent) => {
                 val dateForWeekView      = mouseEvent.target.asInstanceOf[html.LI].value
-                val dayOfWeekForWeekView = ((dateForWeekView - today.date) % 7 + today.dayOfWeek) % 7
+                val dayOfWeekForWeekView = (dateForWeekView - today.date + today.dayOfWeek + 7) % 7
                 println(dateForWeekView)
-                val newCalendar = calendar.copy(today = today.copy(date = dateForWeekView, dayOfWeek = dayOfWeekForWeekView))
+                val newCalendar =
+                  calendar.copy(today =
+                    today.copy(date = dateForWeekView, dayOfWeek = if (dayOfWeekForWeekView == 0) 7 else dayOfWeekForWeekView))
                 //              dom.document.location.href = "/display_event.html"
                 dom.document.location.href = s"/week_view.html?calendar=${newCalendar.asJson}"
               }
@@ -219,8 +221,10 @@ object Bootstrap {
       case (calendar, events) =>
         val eventsByDate = events.groupBy(_.eventStart.getDayOfMonth)
         val daysView     = dom.document.getElementById("days")
-        val date         = calendar.today.date
-        val dayOfDate    = calendar.today.dayOfWeek
+        val eventView    = dom.document.getElementById("events")
+
+        val date      = calendar.today.date
+        val dayOfDate = calendar.today.dayOfWeek
 
         for (index <- (date - (dayOfDate - 1)) to (date + (7 - dayOfDate))) {
           val dayEle =
@@ -230,6 +234,29 @@ object Bootstrap {
               li(index)
 
           val eventRes = eventsByDate.get(index).map { list =>
+            val event = list.head
+
+            val base = 112.84
+
+            val height = (event.eventEnd.getHour - event.eventStart.getHour) * 60
+            val top    = (event.eventStart.getHour - 9) * 60
+            val width  = base
+            val left   = base * event.eventStart.getDayOfWeek.getValue + 30
+
+            val node =
+              div(`class` := "event", style := s"top: ${top}px; left: ${left}px; height: ${height}px; width: ${width}px").render
+            node.innerHTML =
+              s"<span class='title'> ${event.title} </span> <br> <span class='title'> ${event.eventStart.getHour}:00 - ${event.eventEnd.getHour}:00 </span>"
+
+            node.addEventListener(
+              "click",
+              (_: dom.MouseEvent) => {
+                dom.document.location.href = s"event_view.html?event_id=${list.head.id.get}"
+              }
+            )
+
+            eventView.appendChild(node)
+
             dayEle(a(href := s"event_view.html?event_id=${list.head.id.get}")(list.head.title))
           }
           daysView.appendChild(
@@ -241,6 +268,8 @@ object Bootstrap {
           .getElementsByClassName("days")
           .item(0)
           .getElementsByTagName("li")
+
+//        daysView.appendChild(a(href := "./")("Back").render)
 
         for (elm <- 0 to listLi.length) {
           listLi
