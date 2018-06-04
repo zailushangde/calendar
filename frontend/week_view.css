@@ -1,34 +1,22 @@
 .weekdays {
     margin: 0;
     padding: 10px 0;
-    background-color: #ddd;
+    background-color: #57b986;
     left: 100px;
     position: relative;
+    width: 89.3%;
 }
 
 .weekdays li {
     display: inline-block;
     width: 13.6%;
-    color: #666;
+    color: block;
+    font-weight: bold;
     text-align: center;
 }
 
-.days {
-    padding: 10px 0;
-    background: #eee;
-    margin: 0;
-    left: 100px;
-    position: relative;
-}
-
-.days li {
-    list-style-type: none;
-    display: inline-block;
-    width: 13.6%;
-    text-align: center;
-    margin-bottom: 5px;
-    font-size:12px;
-    color: #777;
+.weekdays li span {
+    color: #625886;
 }
 
 .times li {
@@ -49,12 +37,12 @@
 
 .timings {
   text-align: right;
-  width: 100px;
+  width: 111px;
   height: 720px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: white;
+  background-color: #cde6bc;
   font-size: 0.5em;
   box-sizing: border-box
 }
@@ -65,21 +53,34 @@
 }
 
 .event {
-  background-color: white;
+  background-color: #8cce9269;
   border-style: solid;
   border-width: 1px;
   border-left-width: 5px;
-  border-color: #D1D1D1;
-  border-left-color: #57b986;
+  border-color: #57b986;
+  border-left-color: #43ab75;
   padding-left: 10px;
   padding-top: 5px;
   position: absolute;
   font-size: 0.5em;
   box-sizing: border-box;
-  position: relative;
+  position: absolute;
+  margin-left: 108px;
+  margin-top: 64px;
 }
 
 .event .title {
   color: #57b986;
   font-size: 200%;
+}
+
+.grid-1 {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(7, 1fr);
+  height: 100%;
+}
+
+.grid-1 > div {
+    border: 1px solid #d1d1d1;
 }

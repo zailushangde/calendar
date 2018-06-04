@@ -66,8 +66,8 @@ object Bootstrap {
             else
               li(value := day - (firstDayOfWeek - 1))(day - (firstDayOfWeek - 1))
 
-          val eventRes = eventsByDate.get(day - (firstDayOfWeek - 1)).map { list =>
-            res(a(href := s"event_view.html?event_id=${list.head.id.get}")(list.head.title))
+          val eventRes = eventsByDate.get(day - (firstDayOfWeek - 1)).map { eventList =>
+            res(li(List.fill(eventList.size)("。")))
           }
 
           days.appendChild(
@@ -217,36 +217,41 @@ object Bootstrap {
 
     val decodeCalenderFromUrl = URLDecoder.decode(rawCalendar)
     println(decodeCalenderFromUrl)
+
     getDateForWeekView(decodeCalenderFromUrl).map {
       case (calendar, events) =>
         val eventsByDate = events.groupBy(_.eventStart.getDayOfMonth)
-        val daysView     = dom.document.getElementById("days")
         val eventView    = dom.document.getElementById("events")
+        val weekDaysView = dom.document.getElementById("weekdays")
 
         val date      = calendar.today.date
         val dayOfDate = calendar.today.dayOfWeek
 
         for (index <- (date - (dayOfDate - 1)) to (date + (7 - dayOfDate))) {
-          val dayEle =
-            if (index <= 0 || index > calendar.days) {
-              li
-            } else
-              li(index)
+          println(index - (date - (dayOfDate - 1)))
 
-          val eventRes = eventsByDate.get(index).map { list =>
-            val event = list.head
+          if (index > 0)
+            weekDaysView
+              .getElementsByTagName("li")
+              .item(index - (date - (dayOfDate - 1)))
+              .appendChild(span(index).render)
 
-            val base = 112.84
+          eventsByDate.get(index).map { list =>
+            println(list.head)
+            val event      = list.head
+            val eventEnd   = event.eventEnd
+            val eventStart = event.eventStart
+            val base       = 112.84
 
-            val height = (event.eventEnd.getHour - event.eventStart.getHour) * 60
-            val top    = (event.eventStart.getHour - 9) * 60
+            val height = eventEnd.getHour * 60 + eventEnd.getMinute - eventStart.getMinute - eventStart.getHour * 60
+            val top    = eventStart.getHour * 60 + eventStart.getMinute - 9 * 60
             val width  = base
-            val left   = base * event.eventStart.getDayOfWeek.getValue + 30
+            val left   = base * ((eventStart.getDayOfWeek.getValue + 1) % 7 - 1)
 
             val node =
               div(`class` := "event", style := s"top: ${top}px; left: ${left}px; height: ${height}px; width: ${width}px").render
             node.innerHTML =
-              s"<span class='title'> ${event.title} </span> <br> <span class='title'> ${event.eventStart.getHour}:00 - ${event.eventEnd.getHour}:00 </span>"
+              s"<span class='title'> ${event.title} </span> <br> <span class='title'> ${eventStart.getHour}:${eventStart.getMinute} - ${eventEnd.getHour}:${eventEnd.getMinute} </span>"
 
             node.addEventListener(
               "click",
@@ -256,20 +261,13 @@ object Bootstrap {
             )
 
             eventView.appendChild(node)
-
-            dayEle(a(href := s"event_view.html?event_id=${list.head.id.get}")(list.head.title))
           }
-          daysView.appendChild(
-            eventRes.fold(dayEle)(r => r).render
-          )
         }
 
         val listLi = dom.document
           .getElementsByClassName("days")
           .item(0)
           .getElementsByTagName("li")
-
-//        daysView.appendChild(a(href := "./")("Back").render)
 
         for (elm <- 0 to listLi.length) {
           listLi
@@ -281,6 +279,14 @@ object Bootstrap {
               }
             )
         }
+    }
+    val divCollection = dom.document.getElementById("grid").getElementsByTagName("div")
+    for (index <- 0 to divCollection.length) {
+      divCollection
+        .item(index)
+        .addEventListener("click", (_: dom.MouseEvent) => {
+          dom.document.location.href = s"/display_event.html"
+        })
     }
   }
 }
