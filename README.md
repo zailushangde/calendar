@@ -2,7 +2,7 @@
 This repo generates a event calendar for fun :)
 
 ### Screen shot
-![alt text](diagrams/calendar.png)
+![alt text](diagrams/week_view.png)
 
 ### Test
 `sbt backend/test`
