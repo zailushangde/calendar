@@ -246,7 +246,7 @@ object Bootstrap {
             val height = eventEnd.getHour * 60 + eventEnd.getMinute - eventStart.getMinute - eventStart.getHour * 60
             val top    = eventStart.getHour * 60 + eventStart.getMinute - 9 * 60
             val width  = base
-            val left   = base * ((eventStart.getDayOfWeek.getValue + 1) % 7 - 1)
+            val left   = base * (eventStart.getDayOfWeek.getValue % 7)
 
             val node =
               div(`class` := "event", style := s"top: ${top}px; left: ${left}px; height: ${height}px; width: ${width}px").render
